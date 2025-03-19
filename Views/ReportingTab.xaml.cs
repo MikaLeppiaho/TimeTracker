@@ -11,7 +11,7 @@ namespace TimeTracker.Views
         public ReportingTab()
         {
             InitializeComponent();
-            DataContext = new ReportingTabViewModel();
+            DataContext = new ReportingViewModel();
         }
     }
 }

@@ -1,10 +1,51 @@
 ﻿<UserControl x:Class="TimeTracker.Views.ReportingTab"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
-    <Grid>
-        <TextBlock Text="{Binding ReportTitle}" 
-                   FontSize="24" 
-                   HorizontalAlignment="Center" 
-                   VerticalAlignment="Center"/>
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="clr-namespace:TimeTracker.ViewModels"
+             xmlns:common="clr-namespace:TimeTracker.Common"
+             Height="Auto" Width="Auto">
+    <UserControl.Resources>
+        <common:ElapsedTimeConverter x:Key="ElapsedTimeConverter"/>
+    </UserControl.Resources>
+    <UserControl.DataContext>
+        <vm:ReportingViewModel/>
+    </UserControl.DataContext>
+    <Grid Margin="10">
+        <StackPanel>
+            <TextBlock Text="Weekly Report" FontSize="18" FontWeight="Bold" Margin="0,0,0,10"/>
+            <StackPanel Orientation="Horizontal">
+                <TextBlock Text="Current Week: " FontWeight="Bold"/>
+                <TextBlock Text="{Binding CurrentWeekStart, StringFormat={}{0:MM/dd/yyyy}}" Margin="5,0,0,0"/>
+                <TextBlock Text=" - " Margin="5,0,0,0"/>
+                <TextBlock Text="{Binding CurrentWeekEnd, StringFormat={}{0:MM/dd/yyyy}}" Margin="5,0,0,0"/>
+            </StackPanel>
+
+            <ListView ItemsSource="{Binding WeeklyTasks}" Margin="0,20,0,0" Height="300">
+                <ListView.View>
+                    <GridView>
+                        <GridViewColumn Header="Date" 
+                                        DisplayMemberBinding="{Binding CreatedAt, StringFormat=MM/dd/yyyy}" 
+                                        Width="100"/>
+                        <GridViewColumn Header="Task" 
+                                        DisplayMemberBinding="{Binding Name}" 
+                                        Width="150"/>
+                        <GridViewColumn Header="Description" 
+                                        DisplayMemberBinding="{Binding Description}" 
+                                        Width="200"/>
+                        <GridViewColumn Header="Status" 
+                                        DisplayMemberBinding="{Binding Status}" 
+                                        Width="80"/>
+                        <GridViewColumn Header="Elapsed Time" Width="100">
+                            <GridViewColumn.CellTemplate>
+                                <DataTemplate>
+                                    <TextBlock Text="{Binding ., Converter={StaticResource ElapsedTimeConverter}}"/>
+                                </DataTemplate>
+                            </GridViewColumn.CellTemplate>
+                        </GridViewColumn>
+                    </GridView>
+                </ListView.View>
+            </ListView>
+            <!-- Future navigation buttons (e.g., "Previous Week", "Next Week") can be added here -->
+        </StackPanel>
     </Grid>
 </UserControl>

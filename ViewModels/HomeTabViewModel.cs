@@ -174,7 +174,7 @@ namespace TimeTracker.ViewModels
             var newTask = new TaskItem
             {
                 ProjectId = SelectedProject.ProjectId,
-                Name = $"Task started at {DateTime.Now:HH:mm}",
+                Name = SelectedProject.Name,
                 Description = "",
                 Status = TaskStatus.Active,
                 CreatedAt = DateTime.Now,
