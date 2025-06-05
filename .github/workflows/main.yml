@@ -1,0 +1,37 @@
+name: Build and Publish .NET App
+
+on:
+  workflow_dispatch:   # Voit käynnistää käsin GitHubin UI:sta
+
+jobs:
+  build-and-publish:
+    runs-on: ubuntu-latest
+    steps:
+      # Kloonaa repo
+      - uses: actions/checkout@v4
+
+      # Asenna oikea .NET-versio (muokkaa tarvittaessa)
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.0.x'
+
+      # Käännä projekti (päivitä .sln-tiedoston nimi omasi mukaan)
+      - name: Build
+        run: dotnet build MyApp.sln --configuration Release
+
+      # Publisoi julkaisuvalmiit tiedostot (päivitä polku omaksi!)
+      - name: Publish
+        run: dotnet publish ./src/MyApp/MyApp.csproj -c Release -o ./publish
+
+      # Zippaa julkaisu
+      - name: Zip published files
+        run: |
+          cd publish
+          zip -r ../publish.zip .
+
+      # Tallenna buildin lopputulos artefaktiksi (näkyy GitHubissa)
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: publish-zip
+          path: publish.zip
