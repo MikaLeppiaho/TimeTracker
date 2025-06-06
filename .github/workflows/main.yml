@@ -1,34 +1,44 @@
-name: Build and Publish .NET App
+name: Build and Release
 
 on:
-  workflow_dispatch:   # Voit käynnistää käsin GitHubin UI:sta
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: 'Release tag (e.g. v1.0.0)'
+        required: true
 
 jobs:
-  build-and-publish:
+  build:
     runs-on: windows-latest
     steps:
-      # Kloonaa repo
       - uses: actions/checkout@v4
-
-      # Asenna oikea .NET-versio (muokkaa tarvittaessa)
       - uses: actions/setup-dotnet@v4
         with:
           dotnet-version: '9.0.x'
-
-      # Käännä projekti (päivitä .sln-tiedoston nimi omasi mukaan)
       - name: Build
         run: dotnet build TimeTracker.sln --configuration Release
-
-      # Publisoi julkaisuvalmiit tiedostot (päivitä polku omaksi!)
       - name: Publish
         run: dotnet publish ./TimeTracker.csproj -c Release -o ./publish
-
       - name: Zip published files
         run: Compress-Archive -Path publish\* -DestinationPath publish.zip
-        shell: pwsh
-
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
           name: publish-zip
           path: publish.zip
+
+  release:
+    runs-on: windows-latest
+    needs: build
+    steps:
+      - name: Download artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: publish-zip
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ github.event.inputs.tag }}
+          files: publish.zip
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
