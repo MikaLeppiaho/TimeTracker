@@ -20,9 +20,6 @@
                      SelectedItem="{Binding SelectedProject}" 
                      DisplayMemberPath="Name" 
                      Height="150"/>
-            <Button Content="Start Task" 
-                    Command="{Binding StartTaskCommand}" 
-                    Margin="0,10,0,0"/>
 
             <TextBlock Text="Today's Tasks:" FontWeight="Bold" Margin="0,20,0,5"/>
             <ListView ItemsSource="{Binding TodayTasks}" 
@@ -51,11 +48,25 @@
             <TextBlock Text="Task Description:" VerticalAlignment="Center"/>
             <TextBox Width="300" Margin="0,10,0,0" 
                      Text="{Binding TaskDescription, UpdateSourceTrigger=PropertyChanged}" />
-            <Button Content="Toggle Pause/Resume" 
+            <StackPanel Orientation="Horizontal" Margin="10,0,0,0" HorizontalAlignment="Center" Width="234">
+                <Button Content="Start Task" 
+                    Command="{Binding StartTaskCommand}" 
+                    Margin="0,10,0,0" HorizontalAlignment="Center"
+                    />
+                <Button Content="Toggle Pause/Resume" 
                     Command="{Binding ToggleTaskCommand}" 
-                    Margin="0,10,0,0"/>
-            <TextBlock Text="Elapsed Time:" Margin="0,10,0,0" />
-            <TextBlock Text="{Binding CurrentTaskElapsedTime}" FontSize="16" FontWeight="Bold"/>
+                    Margin="8,10,0,0" HorizontalAlignment="Center"/>
+            </StackPanel>
+            <StackPanel Orientation="Horizontal">
+                <StackPanel Orientation="Vertical" Margin="0,0,10,0">
+                    <TextBlock Text="Elapsed Time" Margin="0,10,0,0" />
+                    <TextBlock Text="{Binding CurrentTaskElapsedTime}" FontSize="16" FontWeight="Bold"/>
+                </StackPanel>
+                <StackPanel Orientation="Vertical">
+                    <TextBlock Text="Project Time Left" Margin="0,10,0,0" />
+                    <TextBlock Text="{Binding CurrentProjectTimeLeft}" FontSize="16" FontWeight="Bold"/>
+                </StackPanel>
+            </StackPanel>
         </StackPanel>
     </Grid>
 </UserControl>

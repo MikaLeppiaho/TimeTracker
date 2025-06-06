@@ -1,4 +1,6 @@
-﻿using System.Collections.ObjectModel;
+﻿using Microsoft.EntityFrameworkCore;
+using System.Collections.ObjectModel;
+using System.Windows.Data;
 using System.Windows.Input;
 using System.Windows.Threading;
 using TimeTracker.Common;
@@ -104,6 +106,18 @@ namespace TimeTracker.ViewModels
             }
         }
 
+        public string CurrentProjectTimeLeft
+        {
+            get
+            {
+                var project = SelectedProject ?? ActiveTask?.Project;
+                // Use the selected task if available, otherwise use the active task.
+                if(project == null || project.TimeLeft == TimeSpan.Zero) return "00:00:00";
+                var timeLeft = project.TimeLeft;
+                return timeLeft.ToString(@"dd\:hh\:mm\:ss");
+            }
+        }
+
         // Commands
         public ICommand StartTaskCommand { get; }
         public ICommand ToggleTaskCommand { get; }
@@ -123,8 +137,9 @@ namespace TimeTracker.ViewModels
         _timer.Tick += (s, e) =>
         {
             OnPropertyChanged(nameof(CurrentTaskElapsedTime));
-            // Optionally force the TodayTasks list to update.
-            OnPropertyChanged(nameof(TodayTasks));
+            OnPropertyChanged(nameof(CurrentProjectTimeLeft));
+            // Force the TodayTasks list to refresh so elapsed times update.
+            CollectionViewSource.GetDefaultView(TodayTasks).Refresh();
         };
         _timer.Start();
     }
@@ -139,7 +154,8 @@ namespace TimeTracker.ViewModels
         {
             using (var context = new TimeTrackerContext())
             {
-                var projects = context.Projects.Where(p => p.Status == ProjectStatus.Active).ToList();
+                var projects = context.Projects.Include(p => p.TaskItems)
+                  .Where(p => p.Status == ProjectStatus.Active).ToList();
                 AvailableProjects.Clear();
                 foreach (var proj in projects)
                 {
@@ -215,7 +231,7 @@ namespace TimeTracker.ViewModels
             {
                 task.Status = TaskStatus.Active;
                 // Mark the start of a new active period without losing the accumulated time.
-                //task.CreatedAt = DateTime.Now;
+                task.CreatedAt = DateTime.Now;
                 task.UpdatedAt = DateTime.Now;
                 using (var context = new TimeTrackerContext())
                 {
@@ -261,5 +277,6 @@ namespace TimeTracker.ViewModels
                 context.SaveChanges();
             }
         }
+
     }
 }
