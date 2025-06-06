@@ -5,7 +5,9 @@
              xmlns:common="clr-namespace:TimeTracker.Common"
              StartupUri="MainWindow.xaml">
     <Application.Resources>
-        <common:NullToVisibilityConverter x:Key="NullToVisibilityConverter"/>
-        <common:ElapsedTimeConverter x:Key="ElapsedTimeConverter"/>
+        <ResourceDictionary>
+            <common:NullToVisibilityConverter x:Key="NullToVisibilityConverter"/>
+            <common:ElapsedTimeConverter x:Key="ElapsedTimeConverter"/>
+        </ResourceDictionary>
     </Application.Resources>
 </Application>
